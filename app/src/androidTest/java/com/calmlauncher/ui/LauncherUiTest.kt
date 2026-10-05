@@ -1,11 +1,14 @@
 package com.calmlauncher.ui
 
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.assertContentDescriptionEquals
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.accessibility.enableAccessibilityChecks
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
@@ -17,6 +20,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.calmlauncher.MainActivity
 import com.calmlauncher.R
+import com.calmlauncher.feature.drawer.DrawerTestTags
+import com.calmlauncher.feature.settings.SETTINGS_SEARCH_TAG
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -56,33 +61,54 @@ class LauncherUiTest {
         rule.onRoot().tryPerformAccessibilityChecks()
     }
 
+    /**
+     * Opens the app list with a swipe that starts well above the system gesture area, the
+     * same way a person swipes. (A swipe starting on the very bottom edge belongs to the
+     * system home gesture and is ignored by the launcher on purpose.)
+     */
+    private fun openDrawer() {
+        rule.onRoot().performTouchInput {
+            swipeUp(startY = height * 0.7f, endY = height * 0.2f)
+        }
+        rule.waitUntil(TIMEOUT) { rule.onAllNodesWithTag(DrawerTestTags.SEARCH).fetchSemanticsNodes().isNotEmpty() }
+        // Let the keyboard open and the list settle before interacting.
+        rule.waitForIdle()
+    }
+
     @Test
     fun swipeUpOpensDrawerWithSearch() {
-        rule.onRoot().performTouchInput { swipeUp() }
-        rule.waitUntil(5_000) { rule.onAllNodes(hasSetTextAction()).fetchSemanticsNodes().isNotEmpty() }
-        rule.onNode(hasSetTextAction()).performTextInput("launcher settings")
-        rule.waitUntil(5_000) {
+        openDrawer()
+        rule.onNodeWithTag(DrawerTestTags.SEARCH).performTextInput("launcher settings")
+        rule.waitUntil(TIMEOUT) {
             rule.onAllNodes(hasText(str(R.string.sc_launcher_settings))).fetchSemanticsNodes().isNotEmpty()
         }
     }
 
     @Test
     fun searchCalculatorShowsResult() {
-        rule.onRoot().performTouchInput { swipeUp() }
-        rule.waitUntil(5_000) { rule.onAllNodes(hasSetTextAction()).fetchSemanticsNodes().isNotEmpty() }
-        rule.onNode(hasSetTextAction()).performTextInput("12*3+4")
-        rule.waitUntil(5_000) { rule.onAllNodesWithText("= 40").fetchSemanticsNodes().isNotEmpty() }
+        openDrawer()
+        rule.onNodeWithTag(DrawerTestTags.SEARCH).performTextInput("12*3+4")
+        rule.waitUntil(TIMEOUT) { rule.onAllNodesWithText("= 40").fetchSemanticsNodes().isNotEmpty() }
     }
 
     @Test
     fun settingsAreSearchable() {
-        rule.onRoot().performTouchInput { swipeUp() }
-        rule.waitUntil(5_000) { rule.onAllNodesWithText(str(R.string.drawer_launcher_settings)).fetchSemanticsNodes().isNotEmpty() }
-        rule.onNodeWithText(str(R.string.drawer_launcher_settings)).performClick()
-        rule.waitUntil(5_000) { rule.onAllNodesWithText(str(R.string.settings_search)).fetchSemanticsNodes().isNotEmpty() }
-        rule.onNode(hasSetTextAction()).performTextInput("font")
-        rule.waitUntil(5_000) { rule.onAllNodesWithText(str(R.string.set_font)).fetchSemanticsNodes().isNotEmpty() }
+        openDrawer()
+        // The settings entry is pinned in the drawer header, so it is reachable no matter how
+        // many apps are installed or whether the keyboard is covering the list.
+        rule.onNodeWithTag(DrawerTestTags.SETTINGS)
+            .assertContentDescriptionEquals(str(R.string.drawer_launcher_settings))
+            .performClick()
+        rule.waitUntil(TIMEOUT) { rule.onAllNodesWithTag(SETTINGS_SEARCH_TAG).fetchSemanticsNodes().isNotEmpty() }
+        rule.waitForIdle()
+        rule.onNodeWithTag(SETTINGS_SEARCH_TAG).performTextInput("font")
+        rule.waitUntil(TIMEOUT) { rule.onAllNodesWithText(str(R.string.set_font)).fetchSemanticsNodes().isNotEmpty() }
+        rule.onNodeWithText(str(R.string.set_font)).assertIsDisplayed()
         rule.enableAccessibilityChecks()
         rule.onRoot().tryPerformAccessibilityChecks()
+    }
+
+    private companion object {
+        const val TIMEOUT = 10_000L
     }
 }

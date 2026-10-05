@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- windowLightNavigationBar was added in API 27 (Android 8.1). -->
+    <style name="Theme.Calm" parent="Base.Theme.Calm">
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>

@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base: framework Material theme; everything visible is drawn by Compose. -->
-    <style name="Theme.Calm" parent="android:Theme.Material.Light.NoActionBar">
+    <!--
+      Base: framework Material theme; everything visible is drawn by Compose.
+      Attributes that need a newer API level than minSdk (26) live in values-v27 / values-night-v27,
+      which override Theme.Calm on top of this base. Theme.Calm.Home / Theme.Calm.Gate inherit
+      whichever Theme.Calm the device resolves.
+    -->
+    <style name="Base.Theme.Calm" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/calm_background</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:colorAccent">@color/calm_text</item>
     </style>
+
+    <style name="Theme.Calm" parent="Base.Theme.Calm" />
 
     <!-- Home: show the system wallpaper behind the launcher (Compose draws a scrim or solid colour). -->
     <style name="Theme.Calm.Home">

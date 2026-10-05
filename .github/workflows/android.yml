@@ -32,6 +32,10 @@ jobs:
       - name: Unit tests (domain + app)
         run: ./gradlew --stacktrace :domain:test :app:testDebugUnitTest
 
+      - name: Annotate failing unit tests
+        if: failure()
+        run: python3 .github/scripts/annotate.py junit domain/build/test-results app/build/test-results
+
       - name: Build debug and release APKs
         run: ./gradlew --stacktrace :app:assembleDebug :app:assembleRelease
 
@@ -92,6 +96,9 @@ jobs:
         run: ./gradlew --stacktrace detekt
       - name: Android lint
         run: ./gradlew --stacktrace :app:lintDebug
+      - name: Annotate lint errors
+        if: failure()
+        run: python3 .github/scripts/annotate.py lint app/build/reports/lint-results-debug.xml
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -128,8 +135,13 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: ./gradlew --stacktrace :app:connectedDebugAndroidTest
+      - name: Annotate failing tests
+        if: failure()
+        run: python3 .github/scripts/annotate.py junit app/build/outputs/androidTest-results
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: instrumented-reports
-          path: app/build/reports/androidTests/
+          path: |
+            app/build/reports/androidTests/
+            app/build/outputs/androidTest-results/

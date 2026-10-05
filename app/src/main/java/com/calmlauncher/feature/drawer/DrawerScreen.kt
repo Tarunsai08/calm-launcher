@@ -47,6 +47,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
@@ -199,6 +200,7 @@ fun DrawerScreen(
                         .weight(1f)
                         .heightIn(min = Spacing.touchTarget)
                         .focusRequester(focusRequester)
+                        .testTag(DrawerTestTags.SEARCH)
                         .semantics { contentDescription = placeholder }
                         .onPreviewKeyEvent { e ->
                             if (e.type == KeyEventType.KeyDown && e.key == Key.Escape) {
@@ -231,6 +233,23 @@ fun DrawerScreen(
                             .padding(Spacing.sm),
                     )
                 }
+                // Always visible, whatever the list length or keyboard state: settings must never be
+                // buried at the end of a long app list.
+                val settingsLabel = stringResource(R.string.drawer_launcher_settings)
+                Text(
+                    stringResource(R.string.settings_title).lowercase(),
+                    style = CalmTheme.type.label,
+                    color = CalmTheme.colors.textSecondary,
+                    modifier = Modifier
+                        .heightIn(min = Spacing.touchTarget)
+                        .testTag(DrawerTestTags.SETTINGS)
+                        .semantics { contentDescription = settingsLabel }
+                        .clickable(role = Role.Button) {
+                            closeDrawer()
+                            navigate(Routes.SETTINGS)
+                        }
+                        .padding(Spacing.sm),
+                )
             }
 
             if (single != null && settings.autoLaunchSingleMatch && autoLaunchCancelledFor != state.query) {
@@ -301,6 +320,12 @@ fun DrawerScreen(
             }
         }
     }
+}
+
+/** Stable handles for UI tests. */
+object DrawerTestTags {
+    const val SEARCH = "drawer_search"
+    const val SETTINGS = "drawer_settings"
 }
 
 private fun DrawerItem.isActionable(): Boolean = this !is DrawerItem.Header && this !is DrawerItem.Calculation
