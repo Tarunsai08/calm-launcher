@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base: framework Material theme; everything visible is drawn by Compose. -->
+    <style name="Theme.Calm" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/calm_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:colorAccent">@color/calm_text</item>
+    </style>
+
+    <!-- Home: show the system wallpaper behind the launcher (Compose draws a scrim or solid colour). -->
+    <style name="Theme.Calm.Home">
+        <item name="android:windowShowWallpaper">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowDisablePreview">false</item>
+    </style>
+
+    <style name="Theme.Calm.Gate">
+        <item name="android:windowBackground">@color/calm_background</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>

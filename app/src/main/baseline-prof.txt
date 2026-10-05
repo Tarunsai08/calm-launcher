@@ -1,0 +1,14 @@
+# Starter baseline profile (human-written). Regenerate with:
+#   ./gradlew :app:generateBaselineProfile
+# Covers the cold-start path to an interactive home screen and the drawer/search.
+HSPLcom/calmlauncher/MainActivity;->**(**)**
+HSPLcom/calmlauncher/CalmApplication;->**(**)**
+HSPLcom/calmlauncher/ui/**;->**(**)**
+HSPLcom/calmlauncher/feature/home/**;->**(**)**
+HSPLcom/calmlauncher/feature/drawer/**;->**(**)**
+HSPLcom/calmlauncher/core/designsystem/**;->**(**)**
+HSPLcom/calmlauncher/data/apps/**;->**(**)**
+HSPLcom/calmlauncher/data/settings/**;->**(**)**
+HSPLcom/calmlauncher/domain/search/**;->**(**)**
+HSPLcom/calmlauncher/domain/model/**;->**(**)**
+Lcom/calmlauncher/**;

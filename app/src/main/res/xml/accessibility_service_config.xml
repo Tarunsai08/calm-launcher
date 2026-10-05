@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Minimum capabilities:
+  - Only window-state-change events (which app is in front), no content.
+  - canRetrieveWindowContent=false: the service cannot read anything on screen.
+  - No gestures, key filtering, or touch exploration.
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagDefault"
+    android:canRetrieveWindowContent="false"
+    android:description="@string/accessibility_service_description"
+    android:notificationTimeout="200"
+    android:summary="@string/accessibility_service_summary" />

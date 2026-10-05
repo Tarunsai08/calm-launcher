@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="calm_background">#FFF7F7F5</color>
+    <color name="calm_text">#FF111111</color>
+    <color name="ic_launcher_background">#FF1E2124</color>
+    <color name="ic_launcher_foreground">#FFF2EFE8</color>
+</resources>

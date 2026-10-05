@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Launcher core functionality legitimately needs to see all installed apps. -->
+    <issue id="QueryAllPackagesPermission" severity="ignore" />
+    <!-- Version catalogs are bumped deliberately, not by lint. -->
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="NewerVersionAvailable" severity="ignore" />
+    <issue id="AndroidGradlePluginVersion" severity="ignore" />
+    <!-- English-only for now; structure is ready for translations. -->
+    <issue id="MissingTranslation" severity="ignore" />
+    <!-- Protected/special permissions are requested at runtime through Settings. -->
+    <issue id="ProtectedPermissions" severity="ignore" />
+    <issue id="UnusedResources" severity="warning" />
+    <issue id="ObsoleteSdkInt" severity="warning" />
+    <issue id="DiscouragedPrivateApi" severity="warning" />
+    <issue id="PrivateApi" severity="warning" />
+    <issue id="BatteryLife" severity="warning" />
+</lint>
