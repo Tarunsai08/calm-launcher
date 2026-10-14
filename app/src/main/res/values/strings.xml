@@ -570,7 +570,7 @@
     <string name="set_nav_gestures">Navigation gestures</string>
     <string name="set_nav_gestures_desc">Swipe from the edges for back, home and recent apps. For phones that show buttons with this launcher, like Xiaomi.</string>
     <string name="nav_title">Navigation gestures</string>
-    <string name="nav_intro">Some phones, including Xiaomi, Redmi and POCO, switch to navigation buttons when a launcher other than their own is used. Calm Launcher can provide the gestures itself: swipe in from the left or right edge to go back, swipe up from the bottom to go home, swipe up and hold for recent apps.</string>
+    <string name="nav_intro">Some phones, including Xiaomi, Redmi and POCO, switch to navigation buttons when a launcher other than their own is used. Calm Launcher can provide the same gestures itself: swipe in from the left or right edge to go back, swipe up from the bottom to go home, swipe up and hold for recent apps, and swipe left or right along the bottom to switch apps.</string>
     <string name="nav_status">Status</string>
     <string name="nav_system_mode">System navigation</string>
     <string name="nav_mode_buttons">3 buttons</string>
@@ -588,8 +588,8 @@
     <string name="nav_bottom">Home and recents from the bottom</string>
     <string name="nav_bottom_desc_xiaomi">Swipe up for home, swipe up and hold for recent apps. Works once the navigation buttons are hidden (below).</string>
     <string name="nav_bottom_desc_other">Only used where the system has no gestures of its own at the bottom.</string>
-    <string name="nav_previous_app">Swipe sideways for the previous app</string>
-    <string name="nav_previous_app_desc">Along the bottom edge.</string>
+    <string name="nav_previous_app">Swipe along the bottom to switch apps</string>
+    <string name="nav_previous_app_desc">Swipe right for the previous app, keep going for older ones, swipe left to come back.</string>
     <string name="nav_haptics">Vibrate when a gesture is recognised</string>
     <string name="nav_handle">Show a handle at the bottom</string>
     <string name="nav_handle_desc">A small line that shows where to swipe.</string>
@@ -610,5 +610,5 @@
     <string name="nav_trial_rolled_back">No swipe was detected, so the buttons are back. Try again, or make the bottom strip taller.</string>
     <string name="nav_show_buttons">Show buttons again</string>
     <string name="nav_how_title">Good to know</string>
-    <string name="nav_how_body">If anything feels stuck, turn off the focus helper in Accessibility settings and the buttons return. Some games and full-screen apps may hide the strips.</string>
+    <string name="nav_how_body">Gestures are recognised the way stock Android does it: the back arrow follows your finger and pulling back to the edge cancels, recent apps open as soon as your finger pauses, and taps or long presses on the thin strips go to the app below. Android does not let any app other than the system draw the shrinking app preview while you swipe, so home and app switching use a quick animation instead. If anything feels stuck, turn off the focus helper in Accessibility settings and the buttons return.</string>
 </resources>

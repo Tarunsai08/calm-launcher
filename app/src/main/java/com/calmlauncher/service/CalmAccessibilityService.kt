@@ -3,12 +3,11 @@ package com.calmlauncher.service
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Handler
-import android.os.Looper
 import android.view.accessibility.AccessibilityEvent
 import com.calmlauncher.data.settings.LauncherSettings
 import com.calmlauncher.data.settings.SettingsRepository
 import com.calmlauncher.domain.navigation.NavGesture
+import com.calmlauncher.service.navigation.AppSwitcher
 import com.calmlauncher.service.navigation.GestureNavOverlay
 import com.calmlauncher.service.navigation.NavBarController
 import com.calmlauncher.service.navigation.NavOverlayConfig
@@ -40,13 +39,14 @@ class CalmAccessibilityService : AccessibilityService() {
     @Inject lateinit var navBar: NavBarController
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    private val handler = Handler(Looper.getMainLooper())
     private var overlay: GestureNavOverlay? = null
+    private var switcher: AppSwitcher? = null
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
         overlay = GestureNavOverlay(this, ::onNavGesture)
+        switcher = AppSwitcher(this)
         scope.launch {
             combine(settings.settings, navBar.trial) { s, _ -> s }.collect { applyNavigation(it) }
         }
@@ -55,6 +55,7 @@ class CalmAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null || event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = event.packageName?.toString() ?: return
+        switcher?.onForeground(pkg)
         enforcement.onForeground(pkg, fromAccessibility = true)
     }
 
@@ -83,7 +84,7 @@ class CalmAccessibilityService : AccessibilityService() {
             NavOverlayConfig(
                 sides = s.navBackFromSides,
                 bottom = bottom,
-                previousApp = s.navPreviousApp,
+                quickSwitch = s.navQuickSwitch,
                 edgeWidthDp = s.navEdgeWidthDp,
                 bottomHeightDp = s.navBottomHeightDp,
                 haptics = s.navHaptics,
@@ -104,12 +105,9 @@ class CalmAccessibilityService : AccessibilityService() {
                 performGlobalAction(GLOBAL_ACTION_RECENTS)
                 confirmHideTrial()
             }
-            NavGesture.PREVIOUS_APP -> {
-                // Opening recents twice quickly switches to the previous app on most phones.
-                performGlobalAction(GLOBAL_ACTION_RECENTS)
-                handler.postDelayed({ performGlobalAction(GLOBAL_ACTION_RECENTS) }, PREVIOUS_APP_DELAY_MS)
-            }
-            NavGesture.NONE, NavGesture.TAP -> Unit
+            NavGesture.SWITCH_PREVIOUS -> switcher?.switch(previous = true)
+            NavGesture.SWITCH_NEXT -> switcher?.switch(previous = false)
+            NavGesture.NONE, NavGesture.TAP, NavGesture.LONG_PRESS -> Unit
         }
     }
 
@@ -144,8 +142,6 @@ class CalmAccessibilityService : AccessibilityService() {
     }
 
     companion object {
-        private const val PREVIOUS_APP_DELAY_MS = 180L
-
         @Volatile
         var instance: CalmAccessibilityService? = null
             private set

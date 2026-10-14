@@ -154,9 +154,9 @@ fun NavGesturesScreen(onBack: () -> Unit, navigate: (String) -> Unit, vm: NavGes
             ToggleRow(
                 title = stringResource(R.string.nav_previous_app),
                 description = stringResource(R.string.nav_previous_app_desc),
-                checked = s.navPreviousApp,
+                checked = s.navQuickSwitch,
                 enabled = on && s.navBottomGestures,
-                onCheckedChange = { v -> vm.update { it.copy(navPreviousApp = v) } },
+                onCheckedChange = { v -> vm.update { it.copy(navQuickSwitch = v) } },
             )
             ToggleRow(
                 title = stringResource(R.string.nav_haptics),

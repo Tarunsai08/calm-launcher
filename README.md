@@ -72,7 +72,9 @@ box instead of its home feed.
 Xiaomi/Redmi/POCO (HyperOS/MIUI) switch to navigation buttons when a third-party launcher is the
 home app. Calm Launcher can provide the gestures itself through the focus helper: swipe in from
 the left/right edge = back, swipe up from the bottom = home, swipe up and hold = recent apps,
-optional sideways swipe = previous app. To hide the button bar on Xiaomi, grant one permission
+swipe left/right along the bottom = switch apps
+(previous app, then older ones). Thresholds follow Android's Launcher3/SystemUI behaviour:
+the back arrow follows the finger, recents open the moment the finger pauses. To hide the button bar on Xiaomi, grant one permission
 once from a computer:
 
 ```

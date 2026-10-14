@@ -106,11 +106,11 @@ data class LauncherSettings(
     val navGesturesEnabled: Boolean = false,
     val navBackFromSides: Boolean = true,
     val navBottomGestures: Boolean = true,
-    val navPreviousApp: Boolean = false,
+    val navQuickSwitch: Boolean = true,
     /** Hide the system buttons (Xiaomi only, after a one-time permission from a computer). */
     val navHideButtons: Boolean = false,
     val navEdgeWidthDp: Int = 18,
-    val navBottomHeightDp: Int = 18,
+    val navBottomHeightDp: Int = 24,
     val navHaptics: Boolean = true,
     val navShowHandle: Boolean = false,
 

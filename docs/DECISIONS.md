@@ -83,7 +83,12 @@ user-respecting default.
 HyperOS/MIUI forces the 3-button bar for third-party launchers, and no app can re-enable the
 system's gestures. Instead the existing accessibility service draws thin
 `TYPE_ACCESSIBILITY_OVERLAY` strips (no overlay permission) and maps swipes to
-`performGlobalAction` back/home/recents. Gesture recognition lives in pure Kotlin
+`performGlobalAction` back/home/recents. Recognition follows Launcher3/SystemUI: velocity
+fling detection, recents on motion pause (speed < 0.12 dp/ms for 110 ms after 64 dp up), back
+armed at 36 dp with a finger-following arrow and cancel-by-retracting. Quick switch keeps an
+in-memory list of recent foreground packages from the existing window events and relaunches the
+previous one with a slide animation (a 2.5 s session lets repeated swipes walk further back).
+The system-only live app-preview animation cannot be reproduced by an app. Gesture recognition lives in pure Kotlin
 (`domain/navigation/NavGestureTracker`) with unit tests. Taps on a strip are replayed with
 `dispatchGesture` so the strips never swallow touches. Hiding the bar uses Xiaomi's
 `force_fsg_nav_bar` key, which needs `WRITE_SECURE_SETTINGS` granted via adb; every first hide
