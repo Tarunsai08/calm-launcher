@@ -1,6 +1,9 @@
 package com.calmlauncher.service.navigation
 
 import android.accessibilityservice.AccessibilityService
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.accessibilityservice.GestureDescription
 import android.annotation.SuppressLint
 import android.content.Context
@@ -19,10 +22,12 @@ import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.DecelerateInterpolator
 import com.calmlauncher.domain.navigation.EdgeZone
 import com.calmlauncher.domain.navigation.NavGesture
 import com.calmlauncher.domain.navigation.NavGestureThresholds
 import com.calmlauncher.domain.navigation.NavGestureTracker
+import kotlin.math.exp
 
 /** What the overlay should show, derived from settings and the current system state. */
 data class NavOverlayConfig(
@@ -149,23 +154,25 @@ class GestureNavOverlay(
         return m.widthPixels to m.heightPixels
     }
 
-    /** Back arrow that follows the finger, like Android's back gesture indicator. */
+    /**
+     * HyperOS-style back indicator: a black bulge that grows out of the edge where the finger
+     * started, with a small white chevron that appears once back is armed.
+     */
     private fun showArrow(zone: EdgeZone, rawY: Float, progressPx: Float, armed: Boolean) {
         val a = arrow ?: return
         val params = a.tag as? WindowManager.LayoutParams ?: return
-        val gravity = Gravity.TOP or if (zone == EdgeZone.LEFT) Gravity.START else Gravity.END
-        val y = (rawY - dp(ARROW_H_DP) / 2).toInt()
-        if (params.gravity != gravity || params.y != y || a.visibility != View.VISIBLE) {
-            params.gravity = gravity
-            params.y = y
+        if (!a.showing) {
+            // Anchored where the swipe started, like the system's.
+            params.gravity = Gravity.TOP or if (zone == EdgeZone.LEFT) Gravity.START else Gravity.END
+            params.y = (rawY - dp(ARROW_H_DP) / 2).toInt()
             a.visibility = View.VISIBLE
             runCatching { wm.updateViewLayout(a, params) }
         }
-        a.update(zone == EdgeZone.LEFT, progressPx, armed)
+        a.update(zone == EdgeZone.LEFT, rawY - params.y, progressPx, armed)
     }
 
     private fun hideArrow() {
-        arrow?.visibility = View.GONE
+        arrow?.retract()
     }
 
     /** Hands a tap or long press that landed on a strip to whatever is underneath it. */
@@ -312,51 +319,91 @@ class GestureNavOverlay(
         }
     }
 
-    /** Dark rounded panel with a chevron that stretches as the finger moves in. */
+    /** Black edge bulge with a white chevron, drawn like the HyperOS back gesture. */
     private inner class BackArrowView(context: Context) : View(context) {
+        var showing = false
+            private set
         private var fromLeft = true
-        private var progress = 0f
+        private var bulgeW = 0f
+        private var centerY = 0f
         private var armed = false
-        private val panel = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xE6202124.toInt() }
+        private var chevronAlpha = 0f
+        private var animator: ValueAnimator? = null
+        private val bulge = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xF2000000.toInt() }
         private val chevron = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = 0xFFFFFFFF.toInt()
             style = Paint.Style.STROKE
             strokeCap = Paint.Cap.ROUND
             strokeJoin = Paint.Join.ROUND
+            strokeWidth = dp(2f)
         }
-        private val rect = RectF()
         private val path = Path()
 
         init {
             importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
         }
 
-        fun update(fromLeft: Boolean, progressPx: Float, armed: Boolean) {
+        fun update(fromLeft: Boolean, fingerY: Float, progressPx: Float, armed: Boolean) {
+            animator?.cancel()
+            showing = true
             this.fromLeft = fromLeft
-            progress = progressPx
+            // The bulge leans a little toward the finger as it moves up or down.
+            val anchor = height / 2f
+            centerY = anchor + (fingerY - anchor).coerceIn(-dp(24f), dp(24f))
+            // Rubber band: grows quickly at first, then slowly toward its maximum.
+            val max = dp(BULGE_MAX_DP)
+            bulgeW = max * (1f - exp(-progressPx / (max * 1.6f)))
             this.armed = armed
+            chevronAlpha = if (armed) 1f else ((progressPx - dp(12f)) / dp(40f)).coerceIn(0f, 0.6f)
             invalidate()
         }
 
+        /** Shrinks back into the edge, like the system does on release or cancel. */
+        fun retract() {
+            if (!showing) return
+            showing = false
+            animator?.cancel()
+            val from = bulgeW
+            animator = ValueAnimator.ofFloat(1f, 0f).apply {
+                duration = RETRACT_MS
+                interpolator = DecelerateInterpolator()
+                addUpdateListener {
+                    val f = it.animatedValue as Float
+                    bulgeW = from * f
+                    chevronAlpha *= f
+                    invalidate()
+                }
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        if (!showing) visibility = GONE
+                    }
+                })
+                start()
+            }
+        }
+
         override fun onDraw(canvas: Canvas) {
-            val maxW = width.toFloat() - dp(4f)
-            val w = (progress * 0.6f).coerceIn(dp(8f), maxW)
-            val h = dp(if (armed) 56f else 48f)
-            val cy = height / 2f
-            val left = if (fromLeft) dp(2f) else width - dp(2f) - w
-            rect.set(left, cy - h / 2, left + w, cy + h / 2)
-            panel.alpha = if (armed) 235 else (110 + (progress / dp(36f) * 100).toInt()).coerceAtMost(210)
-            canvas.drawRoundRect(rect, h / 2, h / 2, panel)
-            if (w < dp(20f)) return
-            val cx = rect.centerX()
-            val s = dp(7f)
-            chevron.strokeWidth = dp(if (armed) 3f else 2.5f)
-            chevron.alpha = if (armed) 255 else 170
-            path.reset()
+            if (bulgeW < 0.5f) return
+            val h = dp(BULGE_H_DP) / 2
+            val edge = if (fromLeft) 0f else getWidth().toFloat()
             val dir = if (fromLeft) 1f else -1f
-            path.moveTo(cx + dir * s / 2, cy - s)
-            path.lineTo(cx - dir * s / 2, cy)
-            path.lineTo(cx + dir * s / 2, cy + s)
+            val peak = edge + dir * bulgeW
+            // Smooth bell curve, flat against the edge at both ends.
+            path.reset()
+            path.moveTo(edge, centerY - h)
+            path.cubicTo(edge, centerY - h * 0.45f, peak, centerY - h * 0.38f, peak, centerY)
+            path.cubicTo(peak, centerY + h * 0.38f, edge, centerY + h * 0.45f, edge, centerY + h)
+            path.close()
+            canvas.drawPath(path, bulge)
+            if (chevronAlpha <= 0.01f || bulgeW < dp(10f)) return
+            chevron.alpha = (chevronAlpha * 255).toInt()
+            val cx = edge + dir * bulgeW * 0.48f
+            val s = dp(4.5f)
+            // Points toward the edge, like the system's.
+            path.reset()
+            path.moveTo(cx + dir * s * 0.55f, centerY - s)
+            path.lineTo(cx - dir * s * 0.55f, centerY)
+            path.lineTo(cx + dir * s * 0.55f, centerY + s)
             canvas.drawPath(path, chevron)
         }
     }
@@ -367,7 +414,10 @@ class GestureNavOverlay(
         private const val TICK_MS = 30L
         private const val WINDOW_UPDATE_MS = 40L
         private const val RESTORE_FALLBACK_MS = 600L
-        private const val ARROW_W_DP = 72f
-        private const val ARROW_H_DP = 96f
+        private const val BULGE_MAX_DP = 26f
+        private const val BULGE_H_DP = 210f
+        private const val ARROW_W_DP = BULGE_MAX_DP + 4f
+        private const val ARROW_H_DP = BULGE_H_DP + 64f
+        private const val RETRACT_MS = 180L
     }
 }
