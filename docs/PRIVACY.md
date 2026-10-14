@@ -29,7 +29,12 @@ first. Saying no never breaks the rest of the launcher.
   phone, when a limit or the Insights screen needs it.
 - **Accessibility service ("focus helper")** — receives only "a window changed in app X"
   events. It cannot read screen content (`canRetrieveWindowContent=false`) and does not see
-  what you type. Used for double-tap lock and for applying your own rules everywhere.
+  what you type. Used for double-tap lock, for applying your own rules everywhere, and (only if
+  you turn them on) for navigation gestures: thin edge strips that only see touches starting on
+  them; a plain tap on a strip is replayed to the app below (`canPerformGestures`), nothing is recorded.
+- **WRITE_SECURE_SETTINGS (Xiaomi only, optional)** — can only be granted by you from a computer
+  (`adb shell pm grant`). Used for one value, `force_fsg_nav_bar`, to hide the navigation buttons;
+  the previous value is saved and restored when gestures or the focus helper are switched off.
 - **Notification access** — applies your allow/silence/digest choice per app. Calls, alarms,
   navigation and ongoing notifications are never touched.
 - **Device admin** — `force-lock` only, for double-tap lock on phones where the accessibility

@@ -36,6 +36,7 @@ fun actionLabel(action: LauncherAction, apps: List<LauncherApp>): String = when 
     LauncherAction.None -> stringResource(R.string.action_none)
     LauncherAction.OpenDrawer -> stringResource(R.string.action_open_drawer)
     LauncherAction.OpenSearch -> stringResource(R.string.action_open_search)
+    LauncherAction.WebSearch -> stringResource(R.string.action_web_search)
     LauncherAction.ExpandNotifications -> stringResource(R.string.action_notifications)
     LauncherAction.LockScreen -> stringResource(R.string.action_lock)
     LauncherAction.OpenLauncherSettings -> stringResource(R.string.action_settings)

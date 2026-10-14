@@ -162,6 +162,25 @@ class AppLauncher @Inject constructor(
         return start(Intent(Intent.ACTION_VIEW, url), R.string.no_search_app)
     }
 
+    /**
+     * Opens the web search app straight on its search box (keyboard up), not its home feed.
+     * Tries the user's chosen search app, then Google, then any app that handles global search.
+     */
+    fun openWebSearchUi(preferredPackage: String?): Boolean {
+        val candidates: List<String?> = (listOfNotNull(preferredPackage, GOOGLE_APP) + null).distinct()
+        for (pkg in candidates) {
+            val intent = Intent(SearchManager.INTENT_ACTION_GLOBAL_SEARCH)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NO_ANIMATION)
+            if (pkg != null) intent.setPackage(pkg)
+            if (start(intent, null)) return true
+        }
+        // Older Google app versions: open its search box activity directly.
+        return start(
+            Intent(Intent.ACTION_SEARCH).setPackage(GOOGLE_APP).putExtra(SearchManager.QUERY, ""),
+            null,
+        )
+    }
+
     fun openContact(lookupUri: Uri) = start(Intent(Intent.ACTION_VIEW, lookupUri))
 
     fun openSettingsAction(action: String): Boolean = start(Intent(action), null) ||
@@ -205,5 +224,6 @@ class AppLauncher @Inject constructor(
 
     companion object {
         private const val MAX_SHORTCUTS = 6
+        private const val GOOGLE_APP = "com.google.android.googlequicksearchbox"
     }
 }

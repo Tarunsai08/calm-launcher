@@ -29,6 +29,14 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <!-- Only for the optional fallback monitor to show the pause screen over another app. -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!--
+      Optional, Xiaomi only: hide the system navigation buttons when built-in gestures are on.
+      Android never grants this to apps on its own; the user grants it once from a computer
+      (adb shell pm grant ... WRITE_SECURE_SETTINGS). Without it nothing changes.
+    -->
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
     <!-- No INTERNET permission: the launcher never touches the network. -->
 

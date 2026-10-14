@@ -65,6 +65,24 @@ is committed.
 | Double tap | Lock screen (accessibility on Android 9+, or device-admin fallback) |
 | Long press | Launcher settings |
 
+Pick **Google search (opens keyboard)** for any gesture to open Google straight on its search
+box instead of its home feed.
+
+### Navigation gestures (Settings → Gestures → Navigation gestures)
+Xiaomi/Redmi/POCO (HyperOS/MIUI) switch to navigation buttons when a third-party launcher is the
+home app. Calm Launcher can provide the gestures itself through the focus helper: swipe in from
+the left/right edge = back, swipe up from the bottom = home, swipe up and hold = recent apps,
+optional sideways swipe = previous app. To hide the button bar on Xiaomi, grant one permission
+once from a computer:
+
+```
+adb shell pm grant com.calmlauncher android.permission.WRITE_SECURE_SETTINGS
+```
+
+(For the debug APK use `com.calmlauncher.debug`; the app shows the exact command and a copy button.)
+Then tap **Hide buttons now** and swipe up within 20 seconds; if no swipe arrives, the buttons
+come back on their own. Turning off the focus helper always brings the buttons back.
+
 Touches starting in the system gesture zones are ignored, so Back/Home always win. Every
 gesture has a non-gesture alternative (TalkBack custom actions on home, the drawer footer,
 search, and settings), and typing on a hardware keyboard at home starts a search.
@@ -123,6 +141,7 @@ spacing and line height. Works with system font scaling up to 200%.
 | `SET_ALARM` | Install (normal) | Timer shortcut opens your clock app. |
 | Usage access (`PACKAGE_USAGE_STATS`) | When you turn on limits/insights | Read today's per-app time from Android's own records. |
 | Accessibility service | When you choose it | Double-tap lock; notice which app opened so your rules apply everywhere. App names only. |
+| `WRITE_SECURE_SETTINGS` | Only if you grant it via adb (Xiaomi) | Hide the navigation buttons while built-in gestures are on. |
 | Device admin (`force-lock`) | When you choose it | Double-tap lock fallback. Nothing else. |
 | Notification access | When you set notification rules | Silence or collect notifications you chose. |
 | `POST_NOTIFICATIONS` | When you enable the digest | One reminder when the digest is ready. |

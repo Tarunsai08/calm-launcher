@@ -226,6 +226,12 @@ private fun gestureSection(s: LauncherSettings, apps: List<LauncherApp>, status:
                     LockMethod.NONE -> Unit
                 }
             },
+            SettingItem.Action(
+                "nav_gestures",
+                stringResource(R.string.set_nav_gestures),
+                stringResource(R.string.set_nav_gestures_desc),
+                stringResource(if (s.navGesturesEnabled) R.string.status_on else R.string.status_off),
+            ) { a.navigate(Routes.NAV_GESTURES) },
             SettingItem.Toggle("type_search", stringResource(R.string.set_type_to_search), stringResource(R.string.set_type_to_search_desc), s.typeToSearch) { v ->
                 a.update { it.copy(typeToSearch = v) }
             },

@@ -77,3 +77,21 @@ user-respecting default.
 - No exact alarms, no `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` (Play policy); an OEM help
   screen links to the right settings instead.
 - Android's cloud backup is disabled; users export a local JSON file instead.
+
+## Built-in navigation gestures (Xiaomi)
+
+HyperOS/MIUI forces the 3-button bar for third-party launchers, and no app can re-enable the
+system's gestures. Instead the existing accessibility service draws thin
+`TYPE_ACCESSIBILITY_OVERLAY` strips (no overlay permission) and maps swipes to
+`performGlobalAction` back/home/recents. Gesture recognition lives in pure Kotlin
+(`domain/navigation/NavGestureTracker`) with unit tests. Taps on a strip are replayed with
+`dispatchGesture` so the strips never swallow touches. Hiding the bar uses Xiaomi's
+`force_fsg_nav_bar` key, which needs `WRITE_SECURE_SETTINGS` granted via adb; every first hide
+is a 20-second trial that rolls back unless a working bottom swipe confirms it, and the bar is
+restored whenever the service stops or at app start if the service is off.
+
+## Direct web search action
+
+`LauncherAction.WebSearch` fires `android.search.action.GLOBAL_SEARCH`, aimed at the chosen
+search app, then Google, then any handler, so Google opens on its search box with the keyboard
+up instead of the Discover feed. Falls back to the launcher's own search.

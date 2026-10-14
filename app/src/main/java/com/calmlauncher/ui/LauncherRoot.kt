@@ -41,6 +41,7 @@ import com.calmlauncher.feature.settings.AboutScreen
 import com.calmlauncher.feature.settings.CategoriesScreen
 import com.calmlauncher.feature.settings.FavoritesScreen
 import com.calmlauncher.feature.settings.HiddenAppsScreen
+import com.calmlauncher.feature.settings.NavGesturesScreen
 import com.calmlauncher.feature.settings.OemHelpScreen
 import com.calmlauncher.feature.settings.PermissionExplainerScreen
 import com.calmlauncher.feature.settings.SettingsScreen
@@ -174,6 +175,9 @@ fun LauncherRoot(
         composable(Routes.DIGEST) { DigestScreen(onBack = { nav.popBackStack() }, navigate = { nav.navigateSingleTop(it) }) }
         composable(Routes.NOTIFICATION_RULES) {
             NotificationRulesScreen(onBack = { nav.popBackStack() }, navigate = { nav.navigateSingleTop(it) })
+        }
+        composable(Routes.NAV_GESTURES) {
+            NavGesturesScreen(onBack = { nav.popBackStack() }, navigate = { nav.navigateSingleTop(it) })
         }
         composable(Routes.OEM_HELP) { OemHelpScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.ABOUT) { AboutScreen(onBack = { nav.popBackStack() }, navigate = { nav.navigateSingleTop(it) }) }

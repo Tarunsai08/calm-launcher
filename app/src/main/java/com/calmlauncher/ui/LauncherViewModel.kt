@@ -70,6 +70,9 @@ class LauncherViewModel @Inject constructor(
             LauncherAction.None -> Unit
             LauncherAction.OpenDrawer -> _effects.tryEmit(UiEffect.OpenDrawer)
             LauncherAction.OpenSearch -> _effects.tryEmit(UiEffect.OpenSearch)
+            LauncherAction.WebSearch -> if (!launcher.openWebSearchUi(settings.value.webSearchPackage)) {
+                _effects.tryEmit(UiEffect.OpenSearch)
+            }
             LauncherAction.ExpandNotifications -> if (!systemActions.expandNotifications()) _effects.tryEmit(UiEffect.OpenSearch)
             LauncherAction.LockScreen -> lock()
             LauncherAction.OpenLauncherSettings -> _effects.tryEmit(UiEffect.Navigate(Routes.SETTINGS))

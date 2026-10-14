@@ -10,6 +10,9 @@ sealed interface LauncherAction {
     data object None : LauncherAction { override val storageValue = "none" }
     data object OpenDrawer : LauncherAction { override val storageValue = "drawer" }
     data object OpenSearch : LauncherAction { override val storageValue = "search" }
+
+    /** Opens the phone's web search app (Google) straight on its search box, keyboard up. */
+    data object WebSearch : LauncherAction { override val storageValue = "websearch" }
     data object ExpandNotifications : LauncherAction { override val storageValue = "notifications" }
     data object LockScreen : LauncherAction { override val storageValue = "lock" }
     data object OpenLauncherSettings : LauncherAction { override val storageValue = "settings" }
@@ -29,7 +32,7 @@ sealed interface LauncherAction {
 
     companion object {
         private val simple: List<LauncherAction> = listOf(
-            None, OpenDrawer, OpenSearch, ExpandNotifications, LockScreen, OpenLauncherSettings,
+            None, OpenDrawer, OpenSearch, WebSearch, ExpandNotifications, LockScreen, OpenLauncherSettings,
             ToggleFocus, OpenNotes, OpenTodos, OpenInsights, OpenDigest, DefaultClock,
             DefaultCalendar, DefaultDialer, DefaultCamera,
         )

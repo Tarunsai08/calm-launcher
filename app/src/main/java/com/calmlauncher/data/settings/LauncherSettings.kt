@@ -101,6 +101,19 @@ data class LauncherSettings(
     val lockMethod: LockMethod = LockMethod.NONE,
     val typeToSearch: Boolean = true,
 
+    // System navigation gestures (built in, for phones that switch to buttons with a third-party
+    // launcher, such as Xiaomi). Needs the focus helper (accessibility service).
+    val navGesturesEnabled: Boolean = false,
+    val navBackFromSides: Boolean = true,
+    val navBottomGestures: Boolean = true,
+    val navPreviousApp: Boolean = false,
+    /** Hide the system buttons (Xiaomi only, after a one-time permission from a computer). */
+    val navHideButtons: Boolean = false,
+    val navEdgeWidthDp: Int = 18,
+    val navBottomHeightDp: Int = 18,
+    val navHaptics: Boolean = true,
+    val navShowHandle: Boolean = false,
+
     // Drawer & search
     val autoFocusSearch: Boolean = true,
     val autoLaunchSingleMatch: Boolean = false,

@@ -18,6 +18,7 @@ object Routes {
     const val DIGEST = "digest"
     const val NOTIFICATION_RULES = "notification_rules"
     const val OEM_HELP = "oem_help"
+    const val NAV_GESTURES = "nav_gestures"
     const val PERMISSION_EXPLAINER_PATTERN = "explain/{kind}"
     const val ABOUT = "about"
 
